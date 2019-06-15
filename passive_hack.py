@@ -3,47 +3,42 @@ import subprocess
 import time
 import signal
 import glob, os, os.path
+import sys
 
-interfaces = []
+interface = ""
+scan_interval = 40 # 5 minutes
 
-def getinterfaces():
-	global interfaces
-	interfaces = []
-	mydir = "/root/scripts/passive_hack/scans/"
-	filelist = [ f for f in os.listdir(mydir) if f.endswith(".csv") ]
-	for f in filelist:
-		os.remove(os.path.join(mydir, f))
-
-	for interface in os.listdir('/sys/class/net/'):
-		if "wlan" in interface and "mon" in interface:
-			interfaces.append(interface)
+if len(sys.argv) == 2:
+	interface = sys.argv[1]
+else:
+	print ("No interface provided..")
+	print ("Example: \"passive_hack.py wlan0mon\"")
+	exit()
 
 def scan(interface, scan_interval):
-	interfaces = []
 	#process[] = subprocess.Popen("airodump-ng "+interface+" -w /root/scripts/passive_hack/scans/scan-"+interface+" --write-interval 15 -o csv", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	process = subprocess.Popen(
-		"airodump-ng "+interface+" -w /root/scripts/passive_hack/scans/scan-"+interface+" --write-interval "+str(int(scan_interval//9))+" -o csv & sleep "+str(scan_interval)+" ; kill $!",
+		"airodump-ng "+interface+" -w /root/passive_hack/scans/scan-"+interface+" --write-interval "+str(int(scan_interval//9))+" -o csv & sleep "+str(scan_interval)+" ; kill $!",
 		shell=True,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.PIPE
 	)
+	time.sleep(scan_interval + 15)
 
 def findnexttarget():
 	print ("agggggggggggg")
 
 def capture(interface):
 	process = subprocess.Popen(
-		"airodump-ng "+interface+" -w /root/scripts/passive_hack/scans/scan-"+interface+" --write-interval "+str(int(scan_interval//9))+" -o csv & sleep "+str(scan_interval)+" ; kill $!",
+		"airodump-ng "+interface+" -w /root/passive_hack/scans/scan-"+interface+" --write-interval "+str(int(scan_interval//9))+" -o csv & sleep "+str(scan_interval)+" ; kill $!",
 		shell=True,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.PIPE
 	)
 
-getinterfaces()
-for interface in interfaces:
-	scan(interface, 420)
+scan(interface, scan_interval)
 
-time.sleep(420+15)
+
 
 
 #c=0
