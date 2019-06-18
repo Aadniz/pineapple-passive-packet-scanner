@@ -60,7 +60,8 @@ def firsttime():
 	exit()
 
 if os.path.realpath(__file__) != "/usr/bin/passive":
-	print ("Updating script...\n")
+	if os.path.isdir("/root/passive_hack/") == True:
+		print ("Updating script...\n")
 	firsttime()
 
 def bashcommand(cmd):
