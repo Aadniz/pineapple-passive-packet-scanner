@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###  Passive hash capture tool  #
-##       { VERSION 1.1 }       ##
+##       { VERSION 1.3 }       ##
 #           By D3falt         ###
 
 import os
@@ -10,6 +10,7 @@ import time
 import signal
 import glob, os, os.path
 import sys
+import datetime
 import random
 import shutil
 import glob
@@ -64,6 +65,32 @@ if os.path.realpath(__file__) != "/usr/bin/passive":
 		print ("Updating script...\n")
 	firsttime()
 
+def debug(text):
+	global DEBUG, interface
+	if DEBUG == True:
+		with open("/root/passive_hack/debug", "a") as myfile:
+			now = datetime.datetime.now()
+			myfile.write(str(now.hour) + ":"+str(now.minute)+":"+str(now.second)+":"+interface+": "+text+"\n")
+	print (text)
+
+
+def helpmenu():
+	print (
+		"Pineapple Passive Packet Scanner:\n"+
+		"A python script for the HAK5 Pineapple. Listen to packets, and trying to get hashes without deauthentication.\n"+
+		"This script is meant to be ran for days, weeks or months\n\n"+
+		" --- Arguments:\n\n"+
+		"  --debug / -d     Writes all \"print\" objects to /root/passive_hack/debug\n"+
+		"                   Useful for investigating for issues.\n"+
+		"                   Unfortunately, no errors are written there\n\n"+
+		"  --help / -h      This help menu\n\n"+
+		" --- Examples:\n\n"+
+		"  \"passive wlan0mon\" Starting program on wlan0mon\n"+
+		"  \"passive wlan1mon --debug\" Starting program on wlan1mon with debug enabled\n\n"+
+		" --- More info\n\n"+
+		"  Available at https://github.com/D3faIt/pineapple-passive-packet-scanner"
+	)
+
 def bashcommand(cmd):
 	os.popen(cmd)
 
@@ -73,6 +100,9 @@ def file_get_contents(filename):
 
 def scan(interface, searchHARDER):
 	scan_interval = 300 * searchHARDER # 5 minutes
+	os.system('cls' if os.name == 'nt' else 'clear')
+	debug ("Scanning ("+str(scan_interval)+"s)")
+	time.sleep(2)
 	for file in glob.glob("/root/passive_hack/.cache/scans/scan-"+interface+"*.csv"):
 		if file != "":
 			os.remove(file)
@@ -85,6 +115,9 @@ def scan(interface, searchHARDER):
 	out, err = process.communicate()
 
 def findnexttarget(interface, blacklist):
+	os.system('cls' if os.name == 'nt' else 'clear')
+	debug ("Looking for target...")
+	time.sleep(2)
 	info = file_get_contents("/root/passive_hack/.cache/scans/scan-"+interface+"-01.csv")
 	busy = []
 	if os.path.isfile("/root/passive_hack/.cache/processes/"+interface) == True:
@@ -102,12 +135,16 @@ def findnexttarget(interface, blacklist):
 				f = open("/root/passive_hack/.cache/processes/"+interface,"a")
 				f.write(BSSID)
 				f.close()
-				#print (name)
+				#debug (name)
 				return BSSID, CHANNEL, name
 	return "none", "none", "none"
 
 
 def capture(interface, BSSID, CHANNEL, NAME):
+	os.system('cls' if os.name == 'nt' else 'clear')
+	debug ("Starting capturing \""+NAME+"\" ("+BSSID+") on channel: "+CHANNEL)
+	time.sleep(2)
+	timeslooped = 0
 	while True:
 		for file in glob.glob("/root/passive_hack/.cache/captures/"+interface+"*"):
 			if file != "":
@@ -116,7 +153,6 @@ def capture(interface, BSSID, CHANNEL, NAME):
 		timeout = 1800 # 30 Minutes
 		cmd = "airodump-ng -c "+str(CHANNEL)+" --bssid "+BSSID+" -w /root/passive_hack/.cache/captures/"+interface + " "+ interface+ " & sleep "+str(timeout)+" ; kill $!"
 		processThread = threading.Thread(target=bashcommand, args=[cmd]).start()
-		print ("capturing")
 		time.sleep(timeout)
 
 		if os.path.isfile("/root/passive_hack/.cache/convert/"+interface+".cap") == True:
@@ -130,13 +166,31 @@ def capture(interface, BSSID, CHANNEL, NAME):
 			with open("/root/passive_hack/blacklist.txt", "a") as myfile:
 				myfile.write("\n"+BSSID)
 			break
+		timeslooped +=1
+		if timeslooped > 48*7:
+			os.system('cls' if os.name == 'nt' else 'clear')
+			debug ("Unable to get any hashes from \""+NAME+"\" ("+BSSID+") for over a week...")
+			debug ("WiFi might be unused or too far away")
+			time.sleep(5)
 
+DEBUG = False
 
-if len(sys.argv) == 2:
+if len(sys.argv) > 1:
 	interface = sys.argv[1]
+	for arg in sys.argv:
+		if arg == "--debug" or arg == "-d":
+			DEBUG = True
+			if os.path.isfile("/root/passive_hack/debug") == False:
+				open("/root/passive_hack/debug", 'a').close()
+			with open("/root/passive_hack/debug", "a") as myfile:
+				now = datetime.datetime.now()
+				myfile.write(str(now.hour) + ":"+str(now.minute)+":"+str(now.second)+":"+interface+": ### NEW INSTANCE STARTED\n")
+		if arg == "--help" or arg == "-h":
+			helpmenu()
+			exit()
 else:
-	print ("No interface provided..")
-	print ("Example: \"passive wlan0mon\"")
+	debug ("No interface provided..")
+	debug ("Example: \"passive wlan0mon\"")
 	exit()
 
 while True:
@@ -148,6 +202,15 @@ while True:
 	scan(interface, 1)
 	SCANFUCKINGHARDER=1
 	while True:
+		if SCANFUCKINGHARDER == 6: # 5+10+15+20+25+30 = 105 Minutes = 1.75 Hours
+			os.system('cls' if os.name == 'nt' else 'clear')
+			debug ("Scanning for 1.75 Hours and still no available WiFi?")
+			debug ("You can try these things:")
+			debug ("  - Clear the blacklist.txt")
+			debug ("  - Delete everything inside /root/passive_hack/.cache/processes/")
+			debug ("  - Move the Pineapple to another location")
+			debug ("  - Raise an issue on GitHub: https://github.com/D3faIt/pineapple-passive-packet-scanner/issues/new")
+			exit()
 		blacklist = []
 		for line in file_get_contents("/root/passive_hack/blacklist.txt").split("\n"):
 			if line.strip()[0] != "#":
@@ -160,7 +223,4 @@ while True:
 		else:
 			break
 
-	#findnexttarget(interface, blacklist)
-	print ("BSSID: " + BSSID + "\nName: " + NAME+"\nChannel: "+CHANNEL)
-	time.sleep(2)
 	capture(interface, BSSID, CHANNEL, NAME)
