@@ -22,6 +22,7 @@ It supports multiple network interfaces at the same time, but you cannot run the
 
 ## Known issues
 - The script will max out the CPU. This is because aircrack-ng is running *In the background*. There is a workaround for this using tmux (https://unix.stackexchange.com/a/359903/305898), but hasn't been able to install it. If anyone knows a fix for this, I would be happy to try them out
+- Script does not have executable permissions. Quick fix for this is `chmod +x /usr/bin/passive`
 
 ## NOTES
 for blacklisting networks, put the BSSID or network name inside `/root/passive_hack/blacklist.txt`
