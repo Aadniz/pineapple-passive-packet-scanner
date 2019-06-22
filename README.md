@@ -1,5 +1,6 @@
 # Pineapple Passive Packet Scanner
 A python script for the HAK5 Pineapple (Also works on Debian based systems like kali). Listen to packets, and trying to get hashes without deauthentication.
+It calls aircrack commands, but automate the process
 This script is meant to be ran for days, weeks or months
 
 ## Installation
@@ -30,7 +31,7 @@ The file might look something like this:
     ## BLACKLIST LIST
     ##   The script will blacklist WIFI networks if a captured hash is found
     ##   You might also want to add your own
-    ##   Add either BSSID example: "D4:02:0E:D2:22:3C" or ESSID example: "YourWifiName" (without quotes)\n
+    ##   Add either BSSID example: "D4:02:0E:D2:22:3C" or ESSID example: "YourWifiName" (without quotes)
     78:D1:6E:0E:EE:24
     D4:02:0E:D2:22:3C
     YourWifiName
