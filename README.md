@@ -1,4 +1,4 @@
-# pineapple-passive-packet-scanner
+# Pineapple Passive Packet Scanner
 A python script for the HAK5 Pineapple. Listen to packets, and trying to get hashes without deauthentication.
 This script is meant to be ran for days, weeks or months
 
@@ -18,7 +18,7 @@ Transfer the file via SFTP (for example)
 
 ## Getting started
 You can run it with `passive wlan0mon`
-It supports multiple network interfaces at the same time, but you will have to run them separately
+It supports multiple network interfaces at the same time, but you cannot run them in the same terminal
 
 ## Known issues
 - The script will max out the CPU. This is because aircrack-ng is running *In the background*. There is a workaround for this using tmux (https://unix.stackexchange.com/a/359903/305898), but hasn't been able to install it. If anyone knows a fix for this, I would be happy to try them out
