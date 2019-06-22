@@ -3,8 +3,8 @@ A python script for the HAK5 Pineapple (Also works on Debian based systems like 
 This script is meant to be ran for days, weeks or months
 
 ## Installation
-Download the python script and install it by running it with `python passive.py`
-Transfer the file via SFTP (for example)
+Download the python script and install it by running it with `python passive.py`.
+For the Pineapple, transfer the file via SFTP (for example)
 
 ## How it works
 
