@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###  Passive hash capture tool  #
-##       { VERSION 1.5 }       ##
+##       { VERSION 1.8 }       ##
 #           By D3falt         ###
 
 import os
@@ -173,7 +173,11 @@ def capture(interface, BSSID, CHANNEL, NAME):
 		if os.path.isfile("/root/passive/captures/" + NAME + ".hccap") == True:
 			with open("/root/passive/blacklist.txt", "a") as myfile:
 				myfile.write("\n"+BSSID)
-			debug ("Hash found on \""+NAME+"\" ("+BSSID+")")
+			shutil.copy("/root/passive/.cache/convert/"+interface+".cap", "/root/passive/captures/"+interface+".cap")
+			debug ("Hash found on \""+NAME+"\" ("+BSSID+")\n")
+			debug ("Result is saved here:")
+			debug ("  /root/passive/captures/"+interface+".cap")
+			debug ("  /root/passive/captures/"+interface+".hccap")
 			time.sleep(5)
 			break
 		timeslooped +=1
