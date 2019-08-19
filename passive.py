@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###  Passive hash capture tool  #
-##       { VERSION 1.8 }       ##
+##       { VERSION 1.9 }       ##
 #           By D3falt         ###
 
 import os
@@ -184,12 +184,14 @@ def capture(interface, BSSID, CHANNEL, NAME):
 
 		## You can change this value if you want
 		#
-		if timeslooped > 48*7: # 48 Times * 1800 seconds * 7 days
+		if timeslooped > 48: # 48 Times * 1800 seconds * 7 days
 		#
 		##
 			os.system('cls' if os.name == 'nt' else 'clear')
-			debug ("Unable to get any hashes from \""+NAME+"\" ("+BSSID+") for over a week...")
+			debug ("Unable to get any hashes from \""+NAME+"\" ("+BSSID+") for a period of "+str(timeslooped/2)+" Hours ...")
 			debug ("WiFi might be unused or too far away")
+			time.sleep(3)
+			debug ("Scanning for new target...")
 			time.sleep(5)
 			break
 
@@ -237,7 +239,7 @@ while True:
 			exit()
 		blacklist = []
 		for line in file_get_contents("/root/passive/blacklist.txt").split("\n"):
-			if line.strip()[0] != "#" and line.strip() != "":
+			if line.strip() != "" and line.strip()[0] != "#":
 				blacklist.append(line.strip())
 
 		BSSID, CHANNEL, NAME = findnexttarget(interface, blacklist)
