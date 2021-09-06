@@ -8,8 +8,8 @@ This script is meant to be ran for days, weeks or months
 ## Screenshots
 
 ![Starting the script](/screenshots/Screenshot_20210905_154911_censor.png "Starting")
-![100% CPU issue if fixed. 3 network interfaces stable around 3% CPU](/screenshots/Screenshot_20210905_154359_censor.png "100% CPU issue")
-![Finding a handshake](/screenshots/Screenshot_20210906_070527_censor.png "Finding a handshake")
+<!--![100% CPU issue if fixed. 3 network interfaces stable around 3% CPU](/screenshots/Screenshot_20210905_154359_censor.png "100% CPU issue")
+![Finding a handshake](/screenshots/Screenshot_20210906_070527_censor.png "Finding a handshake")-->
 <!--| Screenshots|
 |------------|
 | <img src="/screenshots/Screenshot_20210905_154911_censor.png" width=49%> <img src="/screenshots/Screenshot_20210906_070527_censor.png" width=49%> |
