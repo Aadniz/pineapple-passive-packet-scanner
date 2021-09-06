@@ -1,3 +1,5 @@
+*Version 2.0 is out! It's a completely re-work, recreation from scratch*
+
 # Pineapple Passive Packet Scanner
 A python script for the HAK5 Pineapple (Also works on Debian based systems like kali). Listen to packets, and trying to get hashes without deauthentication.
 It calls aircrack commands, but automate the process
@@ -5,9 +7,13 @@ This script is meant to be ran for days, weeks or months
 
 ## Screenshots
 
-![Starting the script](/screenshots/Screenshot_20210905_154911_censor.png "Starting")
+<!--- ![Starting the script](/screenshots/Screenshot_20210905_154911_censor.png "Starting")
 ![100% CPU issue if fixed. 3 network interfaces stable around 3% CPU](/screenshots/Screenshot_20210905_154359_censor.png "100% CPU issue")
-![Finding a handshake](/screenshots/Screenshot_20210906_070527_censor.png "Finding a handshake")
+![Finding a handshake](/screenshots/Screenshot_20210906_070527_censor.png "Finding a handshake")-->
+| Screenshots|
+|------------|
+| <img src="/screenshots/Screenshot_20210905_154911_censor.png" width=49%> <img src="/screenshots/Screenshot_20210906_070527_censor.png" width=49%> |
+| <img src="/screenshots/Screenshot_20210905_154359_censor.png" width=100%> |
 
 ## Installation
 Download the python script and install it by running it with `python passive.py`.
@@ -40,3 +46,7 @@ The file might look something like this:
     YourWifiName
     22:94:71:6F:34:A7
     Another_wifi_name
+
+## TODO
+ * arguments
+ * automate hc22000 convertion
