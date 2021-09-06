@@ -3,6 +3,12 @@ A python script for the HAK5 Pineapple (Also works on Debian based systems like 
 It calls aircrack commands, but automate the process
 This script is meant to be ran for days, weeks or months
 
+## Screenshots
+
+![Starting the script](/screenhots/Screenshot_20210905_154911_censor.png "Starting")
+![100% CPU issue if fixed. 3 network interfaces stable around 3% CPU](/screenhots/Screenshot_20210905_154359_censor.png "100% CPU issue")
+![Finding a handshake](/screenhots/Screenshot_20210906_070527_censor.png "Finding a handshake")
+
 ## Installation
 Download the python script and install it by running it with `python passive.py`.
 For the Pineapple, transfer the file via SFTP (for example)
