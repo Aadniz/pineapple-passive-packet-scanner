@@ -32,6 +32,12 @@ For the Pineapple, transfer the file via SFTP (for example)
 You can run it with `passive`, or just continue using `python passive.py`
 It supports multiple network interfaces at the same time!
 
+### Arguments
+Arguments supported right now are these:
+ * -i 
+ * -a
+ * -A
+
 ## NOTES
 for blacklisting networks, put the BSSID or network name inside `/root/passive/blacklist.txt`
 This file is automatically created the first time you run the script.
@@ -48,5 +54,7 @@ The file might look something like this:
     Another_wifi_name
 
 ## TODO
- * arguments
+ * Improve use of arguments
+ * More arguments (uninstall, systemd, control the timers)
+ * Information of other hotspots found
  * automate hc22000 convertion
