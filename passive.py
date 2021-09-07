@@ -218,6 +218,7 @@ def findnexttarget(interface):
 		if found == True:
 			continue
 		line+=","
+
 		info_array.append(csv_to_array(line))
 
 		c=0
@@ -230,7 +231,7 @@ def findnexttarget(interface):
 	c=0
 	for elm in active:
 		if elm[0] == interface:
-			score = float(info_array[c][-1])
+			score = float(info_array[0][-1])
 			boxprint("chosing " + info_array[0][13] + ", score: " + str(round(score, 2)))
 			active[c][3] = info_array[0][13] # name
 			active[c][4] = info_array[0][3]  # channel
@@ -270,8 +271,35 @@ def sendcommand(cmd, interface, suicide_watch):
 if os.path.isdir(datafolder) == False and os.path.isfile("/usr/bin/passive") == False:
 	firsttime()
 
-timescanning = 60*3 # 3 minutes
-timecapture = 60*15 # 15 minutes
+def getargument(arguments, arg):
+	if arg in arguments:
+		c=0
+		resultarguments = []
+		startadding = False
+		for element in arguments:
+			if element == arg:
+				startadding = True
+			elif startadding == True and element[0] == "-":
+				return resultarguments
+			elif startadding == True:
+				resultarguments.append(element)
+			c+=1
+		return resultarguments
+
+arguments = sys.argv[1:]
+
+
+use_all_available = False
+use_force_all_available = False
+interfaces_to_use = []
+
+if "-a" in arguments:
+	use_all_available = True
+if "-A" in arguments:
+	use_force_all_available = True
+if "-i" in arguments:
+	interfaces_to_use = getargument(arguments, "-i")
+
 
 # start by clearing processes
 for file in glob.glob(datafolder+"active/*"):
@@ -283,27 +311,42 @@ for file in glob.glob(datafolder+"active/*"):
 
 # Checking for network interfaces in monitor mode
 interface = ""
-while True:
-	network_interfaces = get_wl_interfaces()
-	c=0
-	print ()
-	for interface in network_interfaces:
-		indicator = ""
-		if "mon" in interface: 
-			indicator = colors.fg.cyan
-		print ("[ "+str(c)+" ] " + indicator + interface.split("/")[-1] + colors.reset)
-		c+=1
-	user_choise = raw_input(colors.fg.cyan + "What network interfaces do you want to toggle monitor mode?"+colors.reset+" ( [0-"+str(c-1)+"]/[EMPTY]/q )\n > ")
-	if user_choise == "q":
-		exit()
-	elif user_choise.isdigit():
-		choise = int(user_choise)
-		if choise >= 0 and c-1 >= choise:
-			toggle_mon(network_interfaces[choise])
-	elif user_choise == "":
-		break
+network_interfaces = []
+if use_all_available == False and use_force_all_available == False and len(interfaces_to_use) == 0:
+	while True:
+		network_interfaces = get_wl_interfaces()
+		c=0
+		print ()
+		for interface in network_interfaces:
+			indicator = ""
+			if "mon" in interface: 
+				indicator = colors.fg.cyan
+			print ("[ "+str(c)+" ] " + indicator + interface.split("/")[-1] + colors.reset)
+			c+=1
+		user_choise = raw_input(colors.fg.cyan + "What network interfaces do you want to toggle monitor mode?"+colors.reset+" ( [0-"+str(c-1)+"]/[EMPTY]/q )\n > ")
+		if user_choise == "q":
+			exit()
+		elif user_choise.isdigit():
+			choise = int(user_choise)
+			if choise >= 0 and c-1 >= choise:
+				toggle_mon(network_interfaces[choise])
+		elif user_choise == "":
+			break
 
-for interface in get_wl_interfaces():
+if len(interfaces_to_use) != 0:
+	network_interfaces = get_wl_interfaces()
+	for desiredinterface in interfaces_to_use:
+		if desiredinterface not in network_interfaces:
+			print(colors.fg.red + desiredinterface + " is a valid network interface in use" + colors.reset)
+			exit()
+	network_interfaces = interfaces_to_use
+
+elif use_force_all_available == True:
+	for interface in get_wl_interfaces():
+		if "mon" not in interface:
+			toggle_mon(interface)
+
+for interface in network_interfaces:
 	if "mon" in interface:
 		if not os.path.exists(datafolder+"active/"+interface):
 			os.makedirs(datafolder+"active/"+interface)
@@ -325,18 +368,28 @@ active = []
 
 #if you have 3 network interfaces, it might look something like this:
 #active = [
-#   0,          1,     2,         3,               4,        5
-#   interface,  state, countdown  focused network  channel,  bssid
-#	["wlan0mon", 0,     300,       "",              "",       "" ],
-#	["wlan1mon", 0,     300,       "",              "",       "" ],
-#	["wlan2mon", 0,     300,       "",              "",       "" ],
+#   0,          1,     2,             3,               4,        5
+#   interface,  state, give up time   focused network  channel,  bssid
+#	["wlan0mon", 0,     7200,          "",              "",       "" ],
+#	["wlan1mon", 0,     7200,          "",              "",       "" ],
+#	["wlan2mon", 0,     7200,          "",              "",       "" ],
 #]
 # state 0: scan
 # state 1: capture
 # state 2: look for handshake
 
-timescanning = 60*3 # 3 minutes
-timecapture = 60*20 # 15 minutes
+#timescanning = 60*3  # 3 minutes
+#timecapture = 60*15  # 15 minutes
+#timegiveup = 60*60*2 # 2 hours. Depending on use case, you might want to decreese or increese
+#                     # Used outdoors => decrees value (suggest something like 5 minutes)
+#                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
+
+timescanning = 60*1  # 3 minutes
+timecapture = 60*3  # 15 minutes
+timegiveup = 60*10 # 2 hours. Depending on use case, you might want to decreese or increese
+                     # Used outdoors => decrees value (suggest something like 5 minutes)
+                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
+
 thasleep = 5 # time before each loop on all interfaces
 
 processThread = threading.Thread();
@@ -355,7 +408,7 @@ while True:
 		for elm in active: # for active interfaces
 			if elm[0] == interface: # if interface
 				if elm[1] == 0: # if in scan mode
-					active[c][2] = active[c][2]-thasleep
+					#active[c][2] = active[c][2]-thasleep
 					foundthread = False
 					for thathread in threading.enumerate():
 						if thathread.name == interface:
@@ -365,6 +418,7 @@ while True:
 				elif elm[1] == 1: # if in capture mode
 					if elm[3] == "": # start for the first time, or when previous network was cracked
 						findnexttarget(interface)
+						active[c][2] = timegiveup
 						tempelm = []
 						for elm2 in active: # need to load from active again
 							if elm2[0] == interface:
@@ -378,8 +432,20 @@ while True:
 						cmd = "airodump-ng -K 1 -c "+str(elm[4])+" --bssid "+elm[5]+" -w "+datafolder+"active/"+interface+"/cap-"+interface + " "+ interface
 						processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timecapture], name=interface).start()
 
+
+					active[c][2] = active[c][2]-thasleep
 					if thread_running(interface) == False:
-						active[c][1] = 2
+						if 0 > active[c][2]:
+							boxprint_error("No handshake was on "+active[c][3]+" found for " + str(timegiveup) + "s!")
+							time.sleep(2)
+							active[c] = [interface, 0, timegiveup, "", "", ""]
+							complete_clean(interface)
+							boxprint("Starting scan on " + interface + " (" + str(timescanning) + "s) ...")
+							cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
+							processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timescanning], name=interface).start()
+						else:
+							active[c][1] = 2
+
 				elif elm[1] == 2: # if in look mode
 					boxprint("Looking for handshake on " + elm[3])
 					cmd = "aircrack-ng -J "+datafolder+"active/"+interface+"/crack-"+interface+" "+datafolder+"active/"+interface+"/cap-"+interface+"-01.cap"
@@ -403,7 +469,7 @@ while True:
 						boxprint("Appending BSSID to blacklist ...")
 						with open(datafolder+"blacklist.txt", "a") as myfile:
 							myfile.write("\n"+elm[5]+"  # " + formatted_ESSID)
-						active[c] = [interface, 0, timescanning, "", "", ""]
+						active[c] = [interface, 0, timegiveup, "", "", ""]
 						complete_clean(interface)
 						boxprint("Starting scan on " + interface + " (" + str(timescanning) + "s) ...")
 						cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
@@ -420,7 +486,7 @@ while True:
 
 			c+=1
 		if found == False:
-			active.append([interface, 0, timescanning, "", "", ""])
+			active.append([interface, 0, 0, "", "", ""])
 			boxprint(interface + " found, initializing scanning")
 			boxprint("Starting scan on " + interface + " (" + str(timescanning) + "s) ...")
 			cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
