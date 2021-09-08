@@ -7,7 +7,7 @@ This script is meant to be ran for days, weeks or months
 
 ## Screenshots
 
-![Starting the script](/screenshots/Screenshot_20210908_045026.png "Starting")
+![Starting the script](/screenshots/Screenshot_20210908_050629.png "Starting")
 <!--![100% CPU issue if fixed. 3 network interfaces stable around 3% CPU](/screenshots/Screenshot_20210905_154359_censor.png "100% CPU issue")
 ![Finding a handshake](/screenshots/Screenshot_20210906_070527_censor.png "Finding a handshake")-->
 <!--| Screenshots|
@@ -20,13 +20,16 @@ Download the python script and install it by running it with `python passive.py`
 For the Pineapple, transfer the file via SFTP (for example)
 
 ## How it works
-
-1. It scans for nearby WiFi networks (for 300 seconds)
-2. Check the blacklist and other interfaces to avoid conflicts
-3. It will choose a network, and start capturing packets
-4. Each 20 minutes, it will check if a hash is captured, otherwise it will clear the .cap files (to avoid HUGE files) and try again
-5. If a hash is captured, it will add it to `/root/passive/captures/` and add the BSSID to the `blacklist.txt`
-6. It will loop and find another WiFi
+*if no arguments is passed*
+1. It will ask you what network interface to use
+2. Press enter to continue, q to abort, or specify a number (network interfaces containing `mon` will be used)
+3. It scans for nearby WiFi networks on specified network interfaces (for 1 minute)
+4. Checks the blacklist and other interfaces to avoid conflicts
+5. It will choose a network, and start capturing packets
+6. Each 3 minutes, it will check if a hash is captured, otherwise it will clear the .cap files (to avoid HUGE files) and try again
+7. If a hash is captured, it will add it to `/root/passive/captures/` and add the BSSID to the `blacklist.txt`
+8. If a hash is **NOT** found on chosen hotspot for over 10 minutes, it will scan again and chose another hotspot
+9. It will loop and find another WiFi
 
 ## Getting started
 You can run it with `passive`, or just continue using `python passive.py`
