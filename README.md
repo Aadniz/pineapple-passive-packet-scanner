@@ -1,4 +1,4 @@
-*Version 2.0 is out! It's a completely re-work, recreation from scratch*
+*Version 2.1 is out! It's a completely re-work, recreation from scratch*
 
 # Pineapple Passive Packet Scanner
 A python script for the HAK5 Pineapple (Also works on Debian based systems like kali). Listen to packets, and trying to get hashes without deauthentication.
@@ -7,7 +7,7 @@ This script is meant to be ran for days, weeks or months
 
 ## Screenshots
 
-![Starting the script](/screenshots/Screenshot_20210905_154911_censor.png "Starting")
+![Starting the script](/screenshots/Screenshot_20210908_045026.png "Starting")
 <!--![100% CPU issue if fixed. 3 network interfaces stable around 3% CPU](/screenshots/Screenshot_20210905_154359_censor.png "100% CPU issue")
 ![Finding a handshake](/screenshots/Screenshot_20210906_070527_censor.png "Finding a handshake")-->
 <!--| Screenshots|
@@ -44,6 +44,7 @@ Option          Meaning
  -c              Specify seconds for capturing (Default: 60*3)
  -t              Specify seconds before giving up on capturing, and looks for another hotspot (Default: 60*10)
  -o              Specify output folder for success handshakes captured (Default: /root/passive/captures)
+ -v, --version   Displays the version
 
  [Extra options]:
 Option          Meaning
@@ -58,7 +59,7 @@ Option          Meaning
   passive -i wlan0mon wlan1mon wlan2mon -c 60*60
  ```
 
-## NOTES
+## Blacklist networks
 for blacklisting networks, put the BSSID or network name inside `/root/passive/blacklist.txt`
 This file is automatically created the first time you run the script.
 The file might look something like this:
@@ -72,6 +73,9 @@ The file might look something like this:
     YourWifiName
     22:94:71:6F:34:A7
     Another_wifi_name
+
+## NOTES
+If you want to use another folder as the base folder, you can change the variable `datafolder` on line 21. Right now it's set to `/root/passive`
 
 ## TODO
  * Improve use of arguments
