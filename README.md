@@ -6,7 +6,7 @@ It uses the aircrack commands, put them as threads and looks at the output after
 The script will utilize the wifi monitor interfaces, and silently listen to the closest hotspot.
 Multiple interfaces is recommended.
 You can start the script and have it run for hours/days/months.
-Should work "out in the fields" / "on the move", or just sitting in one place.
+Should work *out in the fields* / *on the move*, or just sitting in one place.
 Again, the script does not utilize deauthentication, and should go un-noticed by any admin
 
 ## Screenshots
