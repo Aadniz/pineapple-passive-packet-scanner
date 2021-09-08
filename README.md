@@ -30,9 +30,9 @@ For the Pineapple, transfer the file via SFTP (for example)
 3. It scans for nearby WiFi networks on specified network interfaces (for 1 minute)
 4. Checks the blacklist and other interfaces to avoid conflicts
 5. It will choose a network, and start capturing packets
-6. Each 3 minutes, it will check if a hash is captured, otherwise it will clear the .cap files (to avoid HUGE files) and try again
-7. If a hash is captured, it will add it to `/root/passive/captures/` and add the BSSID to the `blacklist.txt`
-8. If a hash is **NOT** found on chosen hotspot for over 10 minutes, it will scan again and chose another hotspot
+6. Each 3 minutes, it will check if a handshake is captured, otherwise it will clear the .cap files (to avoid HUGE files) and try again
+7. If a handshake is captured, it will add it to `/root/passive/captures/` and add the BSSID to the `blacklist.txt`
+8. If a handshake is **NOT** found on chosen hotspot for over 10 minutes, it will scan again and chose another hotspot
 9. It will loop and find another WiFi
 
 ## Getting started
@@ -72,7 +72,7 @@ This file is automatically created the first time you run the script.
 The file might look something like this:
 
     ## BLACKLIST LIST
-    ##   The script will blacklist WIFI networks if a captured hash is found
+    ##   The script will blacklist WIFI networks if a captured handshake is found
     ##   You might also want to add your own
     ##   Add either BSSID example: "D4:02:0E:D2:22:3C" or ESSID example: "YourWifiName" (without quotes)
     78:D1:6E:0E:EE:24
