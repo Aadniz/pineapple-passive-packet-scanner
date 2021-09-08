@@ -34,9 +34,29 @@ It supports multiple network interfaces at the same time!
 
 ### Arguments
 Arguments supported right now are these:
- * -i 
- * -a
- * -A
+```
+Option          Meaning
+ -h, --help      Displays this help menu
+ -a              use all available wifi monitoring interfaces already set in monitor mode (Default: user input choice)
+ -A              use all available wifi monitoring interfaces (Default: user input choice)
+ -i              Specify network interfaces to use (Default: user input choice)
+ -s              Specify seconds for scanning (Default: 60)
+ -c              Specify seconds for capturing (Default: 60*3)
+ -t              Specify seconds before giving up on capturing, and looks for another hotspot (Default: 60*10)
+ -o              Specify output folder for success handshakes captured (Default: /root/passive/captures)
+
+ [Extra options]:
+Option          Meaning
+ --no-colors     Disable colors (Default: False)
+ --loop          Specify seconds for main loop (value must be more than 0) (Default: 5)
+
+ [Examples]:
+  python passive.py -A -s 60*2 -c 60*3 -t 60*10 --loop 4 --no-colors
+  passive -A -t 60*60*2 --no-colors
+  passive -A -o /tmp
+  passive -a -o /root/Documents/captures/
+  passive -i wlan0mon wlan1mon wlan2mon -c 60*60
+ ```
 
 ## NOTES
 for blacklisting networks, put the BSSID or network name inside `/root/passive/blacklist.txt`
