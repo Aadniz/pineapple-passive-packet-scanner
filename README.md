@@ -1,9 +1,13 @@
 *Version 2.1 is out! It's a completely re-work, recreation from scratch*
 
 # Pineapple Passive Packet Scanner
-A python script for the HAK5 Pineapple (Also works on Debian based systems like kali). Listen to packets, and trying to get hashes without deauthentication.
-It calls aircrack commands, but automate the process
-This script is meant to be ran for days, weeks or months
+Passive packet scanner is a cli script meant to capture WPA handshakes without utilizing deauthentication.
+It uses the aircrack commands, put them as threads and looks at the output after the thread is killed.
+The script will utilize the wifi monitor interfaces, and silently listen to the closest hotspot.
+Multiple interfaces is recommended.
+You can start the script and have it run for hours/days/months.
+Should work "out in the fields" / "on the move", or just sitting in one place.
+Again, the script does not utilize deauthentication, and should go un-noticed by any admin
 
 ## Screenshots
 
@@ -73,7 +77,7 @@ The file might look something like this:
     ##   Add either BSSID example: "D4:02:0E:D2:22:3C" or ESSID example: "YourWifiName" (without quotes)
     78:D1:6E:0E:EE:24
     D4:02:0E:D2:22:3C
-    YourWifiName
+    YourWifiName  # Your wifi (yes, hashtag works like you think it would. comments)
     22:94:71:6F:34:A7
     Another_wifi_name
 
