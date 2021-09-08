@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###  Passive hash capture tool  #
-##       { VERSION 2.0 }       ##
+##       { VERSION 2.1 }       ##
 #           By D3falt         ###
 
 from __future__ import print_function
@@ -20,40 +20,80 @@ import re
 
 datafolder = "/root/passive/"
 
+def colors(thacolor):
+	global use_no_colors
+	if use_no_colors == True:
+		return ""
+	elif thacolor == "reset":
+		return '\033[0m'
+	elif thacolor == "black":
+		return '\033[30m'
+	elif thacolor == "red":
+		return '\033[31m'
+	elif thacolor == "green":
+		return '\033[32m'
+	elif thacolor == "orange":
+		return '\033[33m'
+	elif thacolor == "blue":
+		return '\033[34m'
+	elif thacolor == "purple":
+		return '\033[35m'
+	elif thacolor == "cyan":
+		return '\033[36m'
+	elif thacolor == "lightgrey":
+		return '\033[37m'
+	elif thacolor == "darkgrey":
+		return '\033[90m'
+	elif thacolor == "lightred":
+		return '\033[91m'
+	elif thacolor == "lightgreen":
+		return '\033[92m'
+	elif thacolor == "yellow":
+		return '\033[93m'
+	elif thacolor == "lightblue":
+		return '\033[94m'
+	elif thacolor == "pink":
+		return '\033[95m'
+	elif thacolor == "lightcyan":
+		return '\033[96m'
 
-class colors:
-	reset='\033[0m'
-	bold='\033[01m'
-	disable='\033[02m'
-	underline='\033[04m'
-	reverse='\033[07m'
-	strikethrough='\033[09m'
-	invisible='\033[08m'
-	class fg:
-		black='\033[30m'
-		red='\033[31m'
-		green='\033[32m'
-		orange='\033[33m'
-		blue='\033[34m'
-		purple='\033[35m'
-		cyan='\033[36m'
-		lightgrey='\033[37m'
-		darkgrey='\033[90m'
-		lightred='\033[91m'
-		lightgreen='\033[92m'
-		yellow='\033[93m'
-		lightblue='\033[94m'
-		pink='\033[95m'
-		lightcyan='\033[96m'
-	class bg:
-		black='\033[40m'
-		red='\033[41m'
-		green='\033[42m'
-		orange='\033[43m'
-		blue='\033[44m'
-		purple='\033[45m'
-		cyan='\033[46m'
-		lightgrey='\033[47m'
+def helpmenu():
+	print(" -- passive-packet-scanner -- ")
+	print(" [Description]:")
+	print("  Passive packet scanner is a cli script meant to capture WPA handshakes without deauth.")
+	print("  The script will utilize the wifi monitor interfaces, and silently listen to the closest hotspot.")
+	print("  Multiple interfaces is recommended.")
+	print("  You can start the script and have it run for hours/days/months.")
+	print("  Should work \"out in the fields\" / \"on the move\", or just sitting in one place.")
+	print("  Again, the script does not utilize deauthentication, and should go un-noticed by any admin")
+	print("")
+	print(" [Usage]:")
+	print("  passive [OPTIONS]")
+	print("  python passive.py [OPTIONS]")
+	print("")
+	print(" [Options]:")
+	print("Option          Meaning")
+	print(" -h, --help      Displays this help menu")
+	print(" -a              use all available wifi monitoring interfaces already set in monitor mode (Default: user input choice)")
+	print(" -A              use all available wifi monitoring interfaces (Default: user input choice)")
+	print(" -i              Specify network interfaces to use (Default: user input choice)")
+	print(" -s              Specify seconds for scanning (Default: 60)")
+	print(" -c              Specify seconds for capturing (Default: 60*3)")
+	print(" -t              Specify seconds before giving up on capturing, and looks for another hotspot (Default: 60*10)")
+	print(" -o              Specify output folder for success handshakes captured (Default: /root/passive/captures)")
+	print(" -v, --version   Displays the version")
+	print("")
+	print(" [Extra options]:")
+	print("Option          Meaning")
+	print(" --no-colors     Disable colors (Default: False)")
+	print(" --loop          Specify seconds for main loop (value must be more than 0) (Default: 5)")
+	print("")
+	print(" [Examples]:")
+	print("  python passive.py -A -s 60*2 -c 60*3 -t 60*10 --loop 4 --no-colors")
+	print("  passive -A -t 60*60*2 --no-colors")
+	print("  passive -A -o /tmp")
+	print("  passive -a -o /root/Documents/captures/")
+	print("  passive -i wlan0mon wlan1mon wlan2mon -c 60*60")
 
 def firsttime():
 	if os.path.isdir(datafolder) == False:
@@ -103,45 +143,13 @@ def toggle_mon(interface):
 	else:
 		os.system("airmon-ng start "+interface)
 
+def getTime():
+	return datetime.today().strftime('%Y%m%d %H:%M:%S')
+
 def boxprint(text):
-	global box_width
-	thetime = datetime.today().strftime('%Y%m%d %H:%M:%S')
-	clockstring = colors.fg.orange + "[" + colors.reset + thetime + colors.fg.orange + "] "
-	if "\n" in text:
-		for line in text.split("\n"):
-			print(colors.fg.cyan + "| " + clockstring + colors.reset + line + (" "*(box_width-len(line)-23)) + colors.fg.cyan + "|")
-	else:
-		print(colors.fg.cyan + "| " + clockstring + colors.reset + text + (" "*(box_width-len(text)-23)) + colors.fg.cyan + "|")
-
-def boxprint_error(text):
-	global box_width
-	thetime = datetime.today().strftime('%Y%m%d %H:%M:%S')
-	clockstring = colors.fg.orange + "[" + colors.reset + thetime + colors.fg.orange + "] "
-	if "\n" in text:
-		for line in text.split("\n"):
-			print(colors.fg.cyan + "| " + clockstring + colors.fg.red + line + (" "*(box_width-len(line)-23)) + colors.fg.cyan + "|")
-	else:
-		print(colors.fg.cyan + "| " + clockstring + colors.fg.red + text + (" "*(box_width-len(text)-23)) + colors.fg.cyan + "|")
-
-def boxprint_success(text):
-	global box_width
-	thetime = datetime.today().strftime('%Y%m%d %H:%M:%S')
-	clockstring = colors.fg.orange + "[" + colors.reset + thetime + colors.fg.orange + "] "
-	if "\n" in text:
-		for line in text.split("\n"):
-			print(colors.fg.cyan + "| " + clockstring + colors.fg.green + line + (" "*(box_width-len(line)-23)) + colors.fg.cyan + "|")
-	else:
-		print(colors.fg.cyan + "| " + clockstring + colors.fg.green + text + (" "*(box_width-len(text)-23)) + colors.fg.cyan + "|")
-
-def boxprint_info(text):
-	global box_width
-	thetime = datetime.today().strftime('%Y%m%d %H:%M:%S')
-	clockstring = colors.fg.orange + "[" + colors.reset + thetime + colors.fg.orange + "] "
-	if "\n" in text:
-		for line in text.split("\n"):
-			print(colors.fg.cyan + "| " + clockstring + colors.fg.cyan + line + (" "*(box_width-len(line)-23)) + colors.fg.cyan + "|")
-	else:
-		print(colors.fg.cyan + "| " + clockstring + colors.fg.cyan + text + (" "*(box_width-len(text)-23)) + colors.fg.cyan + "|")
+	clockstring = colors("orange") + "[" + colors("reset") + getTime() + colors("orange") + "] " + colors("reset")
+	for line in text.split("\n"):
+		print(clockstring + line)
 
 def file_get_contents(filename):
 	with open(filename) as f:
@@ -176,7 +184,7 @@ def clean_capture(interface):
 
 def complete_clean(interface):
 	for file in glob.glob(datafolder+"active/"+interface+"/*"):
-		boxprint_info ("Deleting: " + file)
+		boxprint(colors("cyan") + "Deleting: " + colors("reset") + file)
 		if os.path.isfile(file) == True:
 			os.remove(file)
 		if os.path.isdir(file) == True:
@@ -184,6 +192,16 @@ def complete_clean(interface):
 
 def formatName(name):
 	return re.sub(r'\W+', '', name)
+
+def updateAllDetectedNetworks(networks):
+	global allDetectedNetworks
+	for elm in networks:
+		found = False
+		for elm2 in allDetectedNetworks:
+			if elm[0] == elm2[0]:
+				found = True
+		if found == False:
+			allDetectedNetworks.append(elm)
 
 def findnexttarget(interface):
 	global active
@@ -207,6 +225,8 @@ def findnexttarget(interface):
 			continue
 		if "WPA2" not in line:
 			continue
+		if line.split(",")[6].strip() == "CCMP TKIP":
+			continue
 		ESSID = line.split(",")[-2].strip()
 		BSSID = line.split(",")[0].strip()
 		found = False
@@ -226,13 +246,15 @@ def findnexttarget(interface):
 			info_array[c][-1] = float(info_array[c][9])*pwr_to_percent(info_array[c][8])
 			c+=1
 
+	updateAllDetectedNetworks(info_array)
+
 	info_array.sort(key=lambda x:x[-1],reverse=True)
 
 	c=0
 	for elm in active:
 		if elm[0] == interface:
 			score = float(info_array[0][-1])
-			boxprint("chosing " + info_array[0][13] + ", score: " + str(round(score, 2)))
+			boxprint("chosing " + colors("cyan") + info_array[0][13] + colors("reset") + ", score: " + str(round(score, 2)))
 			active[c][3] = info_array[0][13] # name
 			active[c][4] = info_array[0][3]  # channel
 			active[c][5] = info_array[0][0]  # BSSID
@@ -288,22 +310,60 @@ def getargument(arguments, arg):
 
 arguments = sys.argv[1:]
 
-
+outfolder = datafolder+"captures/"
 use_all_available = False
 use_force_all_available = False
+use_no_colors = False
 interfaces_to_use = []
 
+timescanning = 60*1  # 3 minutes
+timecapture = 60*3  # 15 minutes
+timegiveup = 60*10 # 2 hours. Depending on use case, you might want to decreese or increese
+                     # Used outdoors => decrees value (suggest something like 5 minutes)
+                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
+
+thasleep = 5 # time before each loop on all interfaces
+
+if "-h" in arguments or "--help" in arguments:
+	helpmenu()
+	exit()
+if "-v" in arguments or "--version" in arguments:
+	print("Passive Packet Scanner Version: 2.1")
+	exit()
 if "-a" in arguments:
 	use_all_available = True
 if "-A" in arguments:
 	use_force_all_available = True
 if "-i" in arguments:
 	interfaces_to_use = getargument(arguments, "-i")
+if "--no-colors" in arguments:
+	use_no_colors = True
+if "--loop" in arguments:
+	thasleep = eval(getargument(arguments, "--loop")[0])
+	if 0 >= thasleep:
+		print (colors("red") + "A loop with 0 seconds sleep will most likely max out the CPU, please specify some higher value"+colors("reset"))
+		exit()
+if "-s" in arguments:
+	timescanning = eval(getargument(arguments, "-s")[0])
+if "-c" in arguments:
+	timecapture = eval(getargument(arguments, "-c")[0])
+if "-t" in arguments:
+	timegiveup = eval(getargument(arguments, "-t")[0])
+	if timecapture > timegiveup:
+		print (colors("red") + "Timeout value needs to be higher than capture period"+colors("reset"))
+		exit()
+if "-o" in arguments:
+	outfolder = getargument(arguments, "-o")[0]
+	if outfolder == "":
+		print (colors("red") + "No output folder provided ?"+colors("reset"))
+		exit()
+	if outfolder[-1] != "/":
+		outfolder += "/"
 
 
 # start by clearing processes
 for file in glob.glob(datafolder+"active/*"):
-	print (colors.fg.cyan + "Deleting: " + colors.reset + file)
+	print (colors("cyan") + "Deleting: " + colors("reset") + file)
 	if os.path.isfile(file) == True:
 		os.remove(file)
 	if os.path.isdir(file) == True:
@@ -320,10 +380,10 @@ if use_all_available == False and use_force_all_available == False and len(inter
 		for interface in network_interfaces:
 			indicator = ""
 			if "mon" in interface: 
-				indicator = colors.fg.cyan
-			print ("[ "+str(c)+" ] " + indicator + interface.split("/")[-1] + colors.reset)
+				indicator = colors("cyan")
+			print ("[ "+str(c)+" ] " + indicator + interface.split("/")[-1] + colors("reset"))
 			c+=1
-		user_choise = raw_input(colors.fg.cyan + "What network interfaces do you want to toggle monitor mode?"+colors.reset+" ( [0-"+str(c-1)+"]/[EMPTY]/q )\n > ")
+		user_choise = raw_input(colors("cyan") + "What network interfaces do you want to toggle monitor mode?"+colors("reset")+" ( [0-"+str(c-1)+"]/[EMPTY]/q )\n > ")
 		if user_choise == "q":
 			exit()
 		elif user_choise.isdigit():
@@ -337,7 +397,7 @@ if len(interfaces_to_use) != 0:
 	network_interfaces = get_wl_interfaces()
 	for desiredinterface in interfaces_to_use:
 		if desiredinterface not in network_interfaces:
-			print(colors.fg.red + desiredinterface + " is a valid network interface in use" + colors.reset)
+			print(colors("red") + desiredinterface + " is a valid network interface in use" + colors("reset"))
 			exit()
 	network_interfaces = interfaces_to_use
 
@@ -345,24 +405,22 @@ elif use_force_all_available == True:
 	for interface in get_wl_interfaces():
 		if "mon" not in interface:
 			toggle_mon(interface)
+	network_interfaces = get_wl_interfaces()
 
 for interface in network_interfaces:
 	if "mon" in interface:
 		if not os.path.exists(datafolder+"active/"+interface):
 			os.makedirs(datafolder+"active/"+interface)
 
-print (colors.fg.cyan)
+print (colors("cyan"))
 
-
-box_width = 85
 
 print ("/###################################################################################\\")
 print ("|/                                                                                 \\|")
-print ("|                             "+colors.reset+"Passive packet scanner 2.0"+colors.fg.cyan+"                            |")
+print ("|                             "+colors("reset")+"Passive packet scanner 2.0"+colors("cyan")+"                            |")
 print ("|\\                                                                                 /|")
 print ("\\###################################################################################/")
-print ("|-----------------------------------------------------------------------------------|")
-print ("|                                                                                   |")
+print ()
 
 active = []
 
@@ -378,19 +436,8 @@ active = []
 # state 1: capture
 # state 2: look for handshake
 
-#timescanning = 60*3  # 3 minutes
-#timecapture = 60*15  # 15 minutes
-#timegiveup = 60*60*2 # 2 hours. Depending on use case, you might want to decreese or increese
-#                     # Used outdoors => decrees value (suggest something like 5 minutes)
-#                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
 
-timescanning = 60*1  # 3 minutes
-timecapture = 60*3  # 15 minutes
-timegiveup = 60*10 # 2 hours. Depending on use case, you might want to decreese or increese
-                     # Used outdoors => decrees value (suggest something like 5 minutes)
-                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
-
-thasleep = 5 # time before each loop on all interfaces
+allDetectedNetworks = [] # global variable
 
 processThread = threading.Thread();
 
@@ -398,7 +445,7 @@ while True:
 	for file in glob.glob(datafolder+"active/*"):
 		interface = file.split("/")[-1]
 		if interface not in get_wl_interfaces():
-			boxprint_error(interface + " is not a valid interface")
+			boxprint(colors("red") + interface + " is not a valid interface" + colors("reset"))
 			boxprint("deleting " + file)
 			shutil.rmtree(file)
 			continue
@@ -436,7 +483,7 @@ while True:
 					active[c][2] = active[c][2]-thasleep
 					if thread_running(interface) == False:
 						if 0 > active[c][2]:
-							boxprint_error("No handshake was on "+active[c][3]+" found for " + str(timegiveup) + "s!")
+							boxprint(colors("orange") + "No handshake was on "+active[c][3]+" found for " + str(timegiveup) + "s!" + colors("reset"))
 							time.sleep(2)
 							active[c] = [interface, 0, timegiveup, "", "", ""]
 							complete_clean(interface)
@@ -459,7 +506,7 @@ while True:
 						elif "Key version" in line:
 							boxprint (line.split("[*] ")[1])
 					if "handshake" in out and not "Key version: 0" in out:
-						boxprint_success("Handshake found for "+elm[3])
+						boxprint(colors("green") + "Handshake found for "+elm[3] + colors("reset"))
 						formatted_ESSID = formatName(elm[3])
 						time.sleep(1)
 						boxprint("Saving to "+datafolder+"captures/"+formatted_ESSID)
@@ -475,7 +522,7 @@ while True:
 						cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
 						processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timescanning], name=interface).start()
 					else:
-						boxprint("Nothing found on "+interface+", continue looking...")
+						boxprint(colors("yellow") + "Nothing found on "+elm[3]+", continue looking..." + colors("reset"))
 						if os.path.isfile(datafolder+"active/"+interface+"/crack-"+interface+".hccap") == False:
 							open(datafolder+"active/"+interface+"/crack-"+interface+".hccap", 'a').close()
 						boxprint("cleaning cap trash in: "+datafolder+"active/"+interface + "/")
@@ -487,7 +534,7 @@ while True:
 			c+=1
 		if found == False:
 			active.append([interface, 0, 0, "", "", ""])
-			boxprint(interface + " found, initializing scanning")
+			boxprint(colors("cyan") + interface + colors("reset") + " found, initializing scanning")
 			boxprint("Starting scan on " + interface + " (" + str(timescanning) + "s) ...")
 			cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
 			processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timescanning], name=interface).start()
