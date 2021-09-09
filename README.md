@@ -57,6 +57,7 @@ Option          Meaning
 Option          Meaning
  --no-colors     Disable colors (Default: False)
  --loop          Specify seconds for main loop (value must be more than 0) (Default: 5)
+ --uninstall     Removes folders and files related to the script except itself
 
  [Examples]:
   python passive.py -A -s 60*2 -c 60*3 -t 60*10 --loop 4 --no-colors
@@ -85,7 +86,6 @@ The file might look something like this:
 If you want to use another folder as the base folder, you can change the variable `datafolder` on line 21. Right now it's set to `/root/passive`
 
 ## TODO
- * Improve use of arguments
- * More arguments (uninstall, systemd, control the timers)
+ * More arguments (systemd)
  * Information of other hotspots found
  * automate hc22000 convertion
