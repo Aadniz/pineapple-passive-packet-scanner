@@ -60,14 +60,28 @@ Option          Meaning
  --uninstall     Removes folders and files related to the script except itself
 
  [Examples]:
-  python passive.py -A -s 60*2 -c 60*3 -t 60*10 --loop 4 --no-colors
-  passive -A -t 60*60*2 --no-colors
-  passive -A -o /tmp
-  passive -a -o /root/Documents/captures/
-  passive -i wlan0mon wlan1mon wlan2mon -c 60*60
+  $ python passive.py -A -s 60*2 -c 60*3 -t 60*10 --loop 4 --no-colors
+  $ passive -A -t 60*60*2 --no-colors
+  $ passive -A -o /tmp
+  $ passive -a -o /root/Documents/captures/
+  $ passive -i wlan0mon wlan1mon wlan2mon -c 60*60
  ```
 
-## Blacklist networks
+### Run in background
+On the pinapple spesifically, there is no `nohup`, and there is no `disown`.
+In that case, this should work:
+
+    $ python passive.py [OPTIONS] 1>/dev/null 2>&1
+    
+Check that the process is running:
+
+    $ jobs -l
+    
+Exit shell:
+
+    $ exit
+
+### Blacklist networks
 for blacklisting networks, put the BSSID or network name inside `/root/passive/blacklist.txt`
 This file is automatically created the first time you run the script.
 The file might look something like this:
@@ -86,6 +100,6 @@ The file might look something like this:
 If you want to use another folder as the base folder, you can change the variable `datafolder` on line 21. Right now it's set to `/root/passive`
 
 ## TODO
- * More arguments (systemd)
+ * Options for startup
  * Information of other hotspots found
  * automate hc22000 convertion
