@@ -87,6 +87,7 @@ def helpmenu():
 	print("Option          Meaning")
 	print(" --no-colors     Disable colors (Default: False)")
 	print(" --loop          Specify seconds for main loop (value must be more than 0) (Default: 5)")
+	print(" --uninstall     Removes folders and files related to the script except itself")
 	print("")
 	print(" [Examples]:")
 	print("  python passive.py -A -s 60*2 -c 60*3 -t 60*10 --loop 4 --no-colors")
@@ -335,6 +336,12 @@ thasleep = 5 # time before each loop on all interfaces
 
 if "-h" in arguments or "--help" in arguments:
 	helpmenu()
+	exit()
+if "--uninstall" in arguments:
+	print ("removing " + datafolder)
+	shutil.rmtree(datafolder)
+	print ("removing /usr/bin/passive")
+	os.remove("/usr/bin/passive")
 	exit()
 if "-v" in arguments or "--version" in arguments:
 	print("Passive Packet Scanner Version: 2.1")
