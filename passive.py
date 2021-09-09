@@ -253,11 +253,20 @@ def findnexttarget(interface):
 	c=0
 	for elm in active:
 		if elm[0] == interface:
-			score = float(info_array[0][-1])
-			boxprint("chosing " + colors("cyan") + info_array[0][13] + colors("reset") + ", score: " + str(round(score, 2)))
-			active[c][3] = info_array[0][13] # name
-			active[c][4] = info_array[0][3]  # channel
-			active[c][5] = info_array[0][0]  # BSSID
+			if len(info_array) == 0:
+				boxprint(colors("orange") + "No available networks found for " + interface + colors("reset"))
+				active[c] = [interface, 0, timegiveup, "", "", ""]
+				complete_clean(interface)
+				boxprint("Scanning more " + interface + " (" + str(timescanning) + "s) ...")
+				cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
+				processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timescanning], name=interface).start()
+				return
+			else:
+				score = float(info_array[0][-1])
+				boxprint("chosing " + colors("cyan") + info_array[0][13] + colors("reset") + ", score: " + str(round(score, 2)))
+				active[c][3] = info_array[0][13] # name
+				active[c][4] = info_array[0][3]  # channel
+				active[c][5] = info_array[0][0]  # BSSID
 		c+=1
 
 def thread_running(interface):
@@ -470,9 +479,10 @@ while True:
 						for elm2 in active: # need to load from active again
 							if elm2[0] == interface:
 								tempelm = elm2
-						boxprint("starting capture of "+tempelm[3]+" on " + interface + " ("+str(timecapture)+"s) ...")
-						cmd = "airodump-ng -K 1 -c "+str(tempelm[4])+" --bssid "+tempelm[5]+" -w "+datafolder+"active/"+interface+"/cap-"+interface + " "+ interface
-						processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timecapture], name=interface).start()
+						if tempelm[5] != "":
+							boxprint("starting capture of "+tempelm[3]+" on " + interface + " ("+str(timecapture)+"s) ...")
+							cmd = "airodump-ng -K 1 -c "+str(tempelm[4])+" --bssid "+tempelm[5]+" -w "+datafolder+"active/"+interface+"/cap-"+interface + " "+ interface
+							processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timecapture], name=interface).start()
 					elif os.path.isfile(datafolder+"active/"+interface+"/crack-"+interface+".hccap") == True and thread_running(interface) == False: # this is if cracking failed
 						os.remove(datafolder+"active/"+interface+"/crack-"+interface+".hccap")
 						boxprint("continuing capture of "+elm[3]+" on " + interface + " ("+str(timecapture)+"s) ...")
@@ -505,7 +515,7 @@ while True:
 							boxprint (line.split(active[c][5])[1].strip())
 						elif "Key version" in line:
 							boxprint (line.split("[*] ")[1])
-					if "handshake" in out and not "Key version: 0" in out:
+					if "handshake" in out and not "Key version: 0" in out and "Key version" in out:
 						boxprint(colors("green") + "Handshake found for "+elm[3] + colors("reset"))
 						formatted_ESSID = formatName(elm[3])
 						time.sleep(1)
