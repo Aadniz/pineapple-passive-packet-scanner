@@ -1,4 +1,4 @@
-*Version 2.1 is out! It's a completely re-work, recreation from scratch*
+*Version 2.2 is out! It's a completely re-work, recreation from scratch*
 
 # Pineapple Passive Packet Scanner
 Passive packet scanner is a cli script meant to capture WPA handshakes without utilizing deauthentication.
