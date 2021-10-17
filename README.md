@@ -106,13 +106,19 @@ The file might look something like this:
     22:94:71:6F:34:A7
     Another_wifi_name
 
+# Troubleshooting
+Look inside the `crash.log` file if you encounter a crash.
+Also might want to consider either contributing to the (crappy) code, or report a [new issue](https://github.com/D3faIt/pineapple-passive-packet-scanner/issues/new)
+
+## Known bugs
+By putting the script in `/etc/rc.local` prevents LED and other minor functionality to work properly.
+
+---
+
 ## NOTES
 If you want to use another folder as the base folder, you can change the variable `datafolder` on line 21. Right now it's set to `/root/passive`
 
 ## TODO
  * Information of other hotspots found
  * automate hc22000 convertion
-
-# Known bugs
-By putting the script in `/etc/rc.local` prevents LED and other minor functionality to work properly.
 
