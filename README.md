@@ -81,6 +81,16 @@ Exit shell:
 
     $ exit
 
+### Run at startup
+For startup scripts realated to openwrt linux distributions, startup scripts can be specified in `/etc/rc.local`
+An example, it can look something like this:
+
+    sleep 10
+    python /root/passive.py -A -s 60*5 -c 60*15 -t 60*60
+
+    # Enter commands above this line
+    exit 0
+
 ### Blacklist networks
 for blacklisting networks, put the BSSID or network name inside `/root/passive/blacklist.txt`
 This file is automatically created the first time you run the script.
@@ -100,6 +110,9 @@ The file might look something like this:
 If you want to use another folder as the base folder, you can change the variable `datafolder` on line 21. Right now it's set to `/root/passive`
 
 ## TODO
- * Options for startup
  * Information of other hotspots found
  * automate hc22000 convertion
+
+# Known bugs
+By putting the script in `/etc/rc.local` prevents LED and other minor functionality to work properly.
+
