@@ -382,6 +382,9 @@ def main():
 			exit()
 		if outfolder[-1] != "/":
 			outfolder += "/"
+		if os.path.isdir(outfolder) == False:
+			subprocess.check_output(['mkdir', '-p', outfolder])
+
 	
 	
 	# start by clearing processes
@@ -533,9 +536,9 @@ def main():
 							boxprint(colors("green") + "Handshake found for "+elm[3] + colors("reset"))
 							formatted_ESSID = formatName(elm[3])
 							time.sleep(1)
-							boxprint("Saving to "+datafolder+"captures/"+formatted_ESSID)
-							shutil.copy2(datafolder+"active/"+interface+"/crack-"+interface+".hccap", datafolder+"captures/"+formatted_ESSID+".hccap")
-							shutil.copy2(datafolder+"active/"+interface+"/cap-"+interface+"-01.cap", datafolder+"captures/"+formatted_ESSID+".cap")
+							boxprint("Saving to "+outfolder+formatted_ESSID)
+							shutil.copy2(datafolder+"active/"+interface+"/crack-"+interface+".hccap", outfolder+formatted_ESSID+".hccap")
+							shutil.copy2(datafolder+"active/"+interface+"/cap-"+interface+"-01.cap", outfolder+formatted_ESSID+".cap")
 							time.sleep(1)
 							boxprint("Appending BSSID to blacklist ...")
 							with open(datafolder+"blacklist.txt", "a") as myfile:
