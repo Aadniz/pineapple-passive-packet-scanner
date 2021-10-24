@@ -122,7 +122,7 @@ def firsttime():
 	print ("\n[+] Successfully installed")
 	print ("Run with this command:")
 	print ("  passive")
-	print ("Or just continue using \"python " + os.path.realpath(__file__)) + "\""
+	print ("Or just continue using \"python " + os.path.realpath(__file__) + "\"")
 	exit()
 
 def pwr_to_percent(pwr):
