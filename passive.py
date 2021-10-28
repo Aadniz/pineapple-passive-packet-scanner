@@ -323,7 +323,7 @@ def getargument(arguments, arg):
 #### -----------------------------------------------------
 
 def main():
-	global datafolder, use_no_colors, active, allDetectedNetworks
+	global datafolder, use_no_colors, active, allDetectedNetworks, timegiveup, timescanning
 
 	arguments = sys.argv[1:]
 	
@@ -336,8 +336,8 @@ def main():
 	timescanning = 60*1  # 3 minutes
 	timecapture = 60*3  # 15 minutes
 	timegiveup = 60*10 # 2 hours. Depending on use case, you might want to decreese or increese
-	                     # Used outdoors => decrees value (suggest something like 5 minutes)
-	                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
+	                    # Used outdoors => decrees value (suggest something like 5 minutes)
+	                    # Used indoors => increese value (suggest something between 2 hours - 2 days)
 	
 	thasleep = 5 # time before each loop on all interfaces
 	
