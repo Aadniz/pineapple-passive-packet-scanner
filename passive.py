@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 ###  Passive hash capture tool  #
-##       { VERSION 2.2 }       ##
-#           By D3falt         ###
+##       { VERSION 2.3 }       ##
+#           By D3faIt         ###
 
 from __future__ import print_function
 import os
@@ -17,6 +17,7 @@ import shutil
 import glob
 import threading
 import re
+import uuid
 
 datafolder = "/root/passive/"
 
@@ -261,6 +262,9 @@ def findnexttarget(interface):
 				return
 			else:
 				score = float(info_array[0][-1])
+				# In case the name is empty
+				if info_array[0][13] == "":
+					info_array[0][13] = "NO_NAME-" + str(uuid.uuid4())
 				boxprint("chosing " + colors("cyan") + info_array[0][13] + colors("reset") + ", score: " + str(round(score, 2)))
 				active[c][3] = info_array[0][13] # name
 				active[c][4] = info_array[0][3]  # channel
@@ -333,11 +337,11 @@ def main():
 	use_no_colors = False
 	interfaces_to_use = []
 	
-	timescanning = 60*1  # 3 minutes
-	timecapture = 60*3  # 15 minutes
-	timegiveup = 60*10 # 2 hours. Depending on use case, you might want to decreese or increese
-	                    # Used outdoors => decrees value (suggest something like 5 minutes)
-	                    # Used indoors => increese value (suggest something between 2 hours - 2 days)
+	timescanning = 60*3  # 3 minutes
+	timecapture = 60*15  # 15 minutes
+	timegiveup = 60*60*2 # 2 hours. Depending on use case, you might want to decreese or increese
+	                     # Used outdoors => decrees value (suggest something like 5 minutes)
+	                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
 	
 	thasleep = 5 # time before each loop on all interfaces
 	
@@ -351,7 +355,7 @@ def main():
 		os.remove("/usr/bin/passive")
 		exit()
 	if "-v" in arguments or "--version" in arguments:
-		print("Passive Packet Scanner Version: 2.2")
+		print("Passive Packet Scanner Version: 2.3")
 		exit()
 	if "-a" in arguments:
 		use_all_available = True
@@ -443,7 +447,7 @@ def main():
 	
 	print ("/###################################################################################\\")
 	print ("|/                                                                                 \\|")
-	print ("|                             "+colors("reset")+"Passive packet scanner 2.0"+colors("cyan")+"                            |")
+	print ("|                             "+colors("reset")+"Passive packet scanner 2.3"+colors("cyan")+"                            |")
 	print ("|\\                                                                                 /|")
 	print ("\\###################################################################################/")
 	print ()
