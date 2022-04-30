@@ -111,7 +111,8 @@ Look inside the `crash.log` file if you encounter a crash.
 Also might want to consider either contributing to the (crappy) code, or report a [new issue](https://github.com/D3faIt/pineapple-passive-packet-scanner/issues/new)
 
 ## Known bugs
-By putting the script in `/etc/rc.local` prevents LED and other minor functionality to work properly.
+* By putting the script in `/etc/rc.local` prevents LED and other minor functionality to work properly.
+* Spawning too many instances, resulting in out of memory error
 
 ---
 
