@@ -110,7 +110,6 @@ Also might want to consider either contributing to the (crappy) code, or report 
 
 ## Known bugs
 * By putting the script in `/etc/rc.local` prevents LED and other minor functionality to work properly.
-* Spawning too many instances, resulting in out of memory error
 
 ---
 
