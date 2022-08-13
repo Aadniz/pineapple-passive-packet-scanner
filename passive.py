@@ -4,12 +4,12 @@
 ##       { VERSION 2.3 }       ##
 #           By D3faIt         ###
 
-from __future__ import print_function
+
 import os
 import subprocess
 import time
 import signal
-import glob, os, os.path
+import glob, os.path
 import sys
 from datetime import datetime
 import random
@@ -297,9 +297,9 @@ def get_wl_interfaces():
 
 def sendcommand(cmd, interface, suicide_watch):
 	if suicide_watch == 0:
-		os.popen(cmd)
+		subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
 	else:
-		os.popen(cmd + " & sleep "+str(suicide_watch)+" ; kill $!")
+		subprocess.Popen(cmd + " & sleep "+str(suicide_watch)+" ; kill $!",shell=True,stdout=subprocess.PIPE)
 
 if os.path.isdir(datafolder) == False and os.path.isfile("/usr/bin/passive") == False:
 	firsttime()
@@ -413,7 +413,7 @@ def main():
 					indicator = colors("cyan")
 				print ("[ "+str(c)+" ] " + indicator + interface.split("/")[-1] + colors("reset"))
 				c+=1
-			user_choise = raw_input(colors("cyan") + "What network interfaces do you want to toggle monitor mode?"+colors("reset")+" ( [0-"+str(c-1)+"]/[EMPTY]/q )\n > ")
+			user_choise = input(colors("cyan") + "What network interfaces do you want to toggle monitor mode?"+colors("reset")+" ( [0-"+str(c-1)+"]/[EMPTY]/q )\n > ")
 			if user_choise == "q":
 				exit()
 			elif user_choise.isdigit():
@@ -530,6 +530,7 @@ def main():
 	
 						proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
 						(out, err) = proc.communicate()
+						out = out.decode()
 						for line in out.split("\n"):
 							line = line.strip()
 							if active[c][5] in line and active[c][3] in line:
