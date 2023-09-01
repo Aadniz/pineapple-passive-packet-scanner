@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###  Passive hash capture tool  #
-##       { VERSION 2.3 }       ##
+##       { VERSION 2.4 }       ##
 #           By D3faIt         ###
 
 
@@ -330,21 +330,21 @@ def main():
 	global datafolder, use_no_colors, active, allDetectedNetworks, timegiveup, timescanning
 
 	arguments = sys.argv[1:]
-	
+
 	outfolder = datafolder+"captures/"
 	use_all_available = False
 	use_force_all_available = False
 	use_no_colors = False
 	interfaces_to_use = []
-	
+
 	timescanning = 60*3  # 3 minutes
 	timecapture = 60*15  # 15 minutes
 	timegiveup = 60*60*2 # 2 hours. Depending on use case, you might want to decreese or increese
 	                     # Used outdoors => decrees value (suggest something like 5 minutes)
 	                     # Used indoors => increese value (suggest something between 2 hours - 2 days)
-	
+
 	thasleep = 5 # time before each loop on all interfaces
-	
+
 	if "-h" in arguments or "--help" in arguments:
 		helpmenu()
 		exit()
@@ -389,8 +389,8 @@ def main():
 		if os.path.isdir(outfolder) == False:
 			subprocess.check_output(['mkdir', '-p', outfolder])
 
-	
-	
+
+
 	# start by clearing processes
 	for file in glob.glob(datafolder+"active/*"):
 		print (colors("cyan") + "Deleting: " + colors("reset") + file)
@@ -398,7 +398,7 @@ def main():
 			os.remove(file)
 		if os.path.isdir(file) == True:
 			shutil.rmtree(file)
-	
+
 	# Checking for network interfaces in monitor mode
 	interface = ""
 	network_interfaces = []
@@ -422,7 +422,7 @@ def main():
 					toggle_mon(network_interfaces[choise])
 			elif user_choise == "":
 				break
-	
+
 	if len(interfaces_to_use) != 0:
 		network_interfaces = get_wl_interfaces()
 		for desiredinterface in interfaces_to_use:
@@ -430,30 +430,30 @@ def main():
 				print(colors("red") + desiredinterface + " is a valid network interface in use" + colors("reset"))
 				exit()
 		network_interfaces = interfaces_to_use
-	
+
 	elif use_force_all_available == True:
 		for interface in get_wl_interfaces():
 			if "mon" not in interface:
 				toggle_mon(interface)
 		network_interfaces = get_wl_interfaces()
-	
+
 	for interface in network_interfaces:
 		if "mon" in interface:
 			if not os.path.exists(datafolder+"active/"+interface):
 				os.makedirs(datafolder+"active/"+interface)
-	
+
 	print (colors("cyan"))
-	
-	
+
+
 	print ("/###################################################################################\\")
 	print ("|/                                                                                 \\|")
 	print ("|                             "+colors("reset")+"Passive packet scanner 2.3"+colors("cyan")+"                            |")
 	print ("|\\                                                                                 /|")
 	print ("\\###################################################################################/")
 	print ()
-	
+
 	active = []
-	
+
 	#if you have 3 network interfaces, it might look something like this:
 	#active = [
 	#   0,          1,     2,             3,               4,        5
@@ -465,12 +465,12 @@ def main():
 	# state 0: scan
 	# state 1: capture
 	# state 2: look for handshake
-	
-	
+
+
 	allDetectedNetworks = [] # global variable
-	
+
 	processThread = threading.Thread();
-	
+
 	while True:
 		for file in glob.glob(datafolder+"active/*"):
 			interface = file.split("/")[-1]
@@ -479,7 +479,7 @@ def main():
 				boxprint("deleting " + file)
 				shutil.rmtree(file)
 				continue
-			
+
 			c=0
 			found = False
 			for elm in active: # for active interfaces
@@ -509,8 +509,8 @@ def main():
 							boxprint("continuing capture of "+elm[3]+" on " + interface + " ("+str(timecapture)+"s) ...")
 							cmd = "airodump-ng -K 1 -c "+str(elm[4])+" --bssid "+elm[5]+" -w "+datafolder+"active/"+interface+"/cap-"+interface + " "+ interface
 							processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timecapture], name=interface).start()
-	
-	
+
+
 						active[c][2] = active[c][2]-thasleep
 						if thread_running(interface) == False:
 							if 0 > active[c][2]:
@@ -523,11 +523,11 @@ def main():
 								processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timescanning], name=interface).start()
 							else:
 								active[c][1] = 2
-	
+
 					elif elm[1] == 2: # if in look mode
 						boxprint("Looking for handshake on " + elm[3])
 						cmd = "aircrack-ng -J "+datafolder+"active/"+interface+"/crack-"+interface+" "+datafolder+"active/"+interface+"/cap-"+interface+"-01.cap"
-	
+
 						proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
 						(out, err) = proc.communicate()
 						out = out.decode()
@@ -560,9 +560,9 @@ def main():
 							boxprint("cleaning cap trash in: "+datafolder+"active/"+interface + "/")
 							active[c][1] = 1
 							clean_capture(interface)
-	
+
 					found = True
-	
+
 				c+=1
 			if found == False:
 				active.append([interface, 0, 0, "", "", ""])
@@ -570,8 +570,8 @@ def main():
 				boxprint("Starting scan on " + interface + " (" + str(timescanning) + "s) ...")
 				cmd = "airodump-ng -K 1 "+interface+" -w "+datafolder+"active/"+interface+"/scan-"+interface+" -o csv"
 				processThread = threading.Thread(target=sendcommand, args=[cmd, interface, timescanning], name=interface).start()
-				
-	
+
+
 		time.sleep(thasleep)
 
 if __name__ == "__main__":
