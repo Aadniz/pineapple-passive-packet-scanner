@@ -20,7 +20,7 @@ Again, the script does not utilize deauthentication, and should go un-noticed by
 ## Installation
 
 * python 2: Use the [python2 branch](https://github.com/D3faIt/pineapple-passive-packet-scanner/tree/python2)
-* python 3: Use the main branch
+* python 3: Use the master branch
 
 Download the python script and install it by running it with `python passive.py`.
 For the Pineapple, transfer the file via SFTP (for example)
