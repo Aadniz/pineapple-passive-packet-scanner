@@ -2,7 +2,7 @@
 
 ###  Passive hash capture tool  #
 ##       { VERSION 2.4 }       ##
-#           By D3faIt         ###
+#           By Aadniz         ###
 
 
 import os
